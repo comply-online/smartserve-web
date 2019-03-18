@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+
+  <button onclick="test()">Test</button>
+  <button onclick="logout()">Logout</button>
+
+  <script src="./keycloak.js"></script>
+  <script>
+    var keycloak = Keycloak();
+    keycloak.init({
+      onLoad: 'login-required'
+    }).success(function (authenticated) {
+      console.log(authenticated ? 'authenticated' : 'not authenticated');
+      console.log("Keycloak:", keycloak);
+      getUserDetails();
+    }).error(function () {
+      console.error('failed to initialize');
+    });
+
+    async function getUserDetails() {
+      keycloak.loadUserProfile().success(function (profile) {
+        console.log("User Profile:", profile);
+        console.log("Attributes:", profile.attributes);
+        console.log("User Id:", keycloak.subject);
+      }).error(function () {
+        console.error('Failed to load user profile');
+      });
+    }
+
+    // How to call a service protected by Keycloak
+    var loadData = function () {
+      //document.getElementById('username').innerText = keycloak.subject;
+
+      var url = 'https://api.comply-online.com/mock';
+
+      var req = new XMLHttpRequest();
+      req.open('GET', url, true);
+      req.setRequestHeader('Accept', 'application/json');
+      req.setRequestHeader('Authorization', 'Bearer ' + keycloak.token);
+
+      req.onreadystatechange = function () {
+        if (req.readyState == 4) {
+          if (req.status == 200) {
+            console.log('Success');
+          } else if (req.status == 403) {
+            console.error('Forbidden');
+          }
+        }
+      }
+
+      req.send();
+    };
+
+    var test = function () {
+      keycloak.updateToken(30).success(function () {
+        loadData();
+      }).error(function (error) {
+        alert('Failed to refresh token');
+      });
+    }
+
+    var logout = function () {
+      keycloak.logout();
+    }
+  </script>
+</body>
+
+</html>
