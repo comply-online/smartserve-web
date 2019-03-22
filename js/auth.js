@@ -254,7 +254,7 @@ function logout() {
   console.log("cognitoUser:", cognitoUser);
   cognitoUser.signOut();
   AWS.config.credentials.clearCachedId(); // Clears the cached Cognito ID associated with the currently configured identity pool ID
-  redirect("/index.html");
+  redirect("./index.html");
 }
 
 function forgotPassword(username) {
