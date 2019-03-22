@@ -13,44 +13,26 @@
   <button onclick="test()">Test</button>
   <button onclick="logout()">Logout</button>
 
-  <script src="./keycloak.js"></script>
+  <script src="../js/aws-sdk.min.js"></script>
+  <script src="../js/amazon-cognito-auth.min.js"></script>
+  <script src="../js/amazon-cognito-identity.min.js"></script>
+  <script src="../js/auth.js"></script>
+
   <script>
-    var keycloak = Keycloak();
-    keycloak.init({
-      onLoad: 'login-required'
-    }).success(function (authenticated) {
-      console.log(authenticated ? 'authenticated' : 'not authenticated');
-      console.log("Keycloak:", keycloak);
-      getUserDetails();
-    }).error(function () {
-      console.error('failed to initialize');
-    });
 
-    async function getUserDetails() {
-      keycloak.loadUserProfile().success(function (profile) {
-        console.log("User Profile:", profile);
-        console.log("Attributes:", profile.attributes);
-        console.log("User Id:", keycloak.subject);
-      }).error(function () {
-        console.error('Failed to load user profile');
-      });
-    }
+    // TODO Add AWS COGNITO
 
-    // How to call a service protected by Keycloak
     var loadData = function () {
-      //document.getElementById('username').innerText = keycloak.subject;
-
-      var url = 'https://api.comply-online.com/mock';
+      var url = 'https://smartserve-users.herokuapp.com/api/v1/users';
 
       var req = new XMLHttpRequest();
       req.open('GET', url, true);
       req.setRequestHeader('Accept', 'application/json');
-      req.setRequestHeader('Authorization', 'Bearer ' + keycloak.token);
 
       req.onreadystatechange = function () {
         if (req.readyState == 4) {
           if (req.status == 200) {
-            console.log('Success');
+            console.log('Success:', req.response);
           } else if (req.status == 403) {
             console.error('Forbidden');
           }
@@ -61,16 +43,12 @@
     };
 
     var test = function () {
-      keycloak.updateToken(30).success(function () {
-        loadData();
-      }).error(function (error) {
-        alert('Failed to refresh token');
-      });
+      loadData();
     }
 
     var logout = function () {
-      keycloak.logout();
     }
+
   </script>
 </body>
 

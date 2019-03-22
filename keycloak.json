@@ -1,8 +1,0 @@
-{
-  "realm": "smartserve",
-  "auth-server-url": "https://auth.comply-online.com/auth",
-  "ssl-required": "external",
-  "resource": "web",
-  "public-client": true,
-  "confidential-port": 0
-}
